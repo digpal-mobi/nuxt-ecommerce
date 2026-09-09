@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+@theme {
+  /* Responsive Breakpoints */
+  --breakpoint-mobile-xs: 375px;
+  --breakpoint-mobile: 480px;
+  --breakpoint-mobile-lg: 640px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-laptop: 1024px;
+  --breakpoint-desktop: 1280px;
+  --breakpoint-desktop-lg: 1440px;
+  --breakpoint-desktop-2xl: 1536px;
+
+  --color-primary: #49BBBD;
+  --color-secondary: #252641;
+}
