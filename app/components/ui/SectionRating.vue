@@ -17,7 +17,7 @@ const props = withDefaults(defineProps<Props>(), {
     <div class="flex items-center gap-[5px]">
       <span
         v-for="star in maxStars"
-        :key="star"
+        :key="star" 
         class="text-[18px] leading-none"
         :class="star <= Math.round(props.rating) ? 'text-[#FFC633]' : 'text-gray-300'"
       >

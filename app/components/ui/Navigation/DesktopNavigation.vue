@@ -1,14 +1,16 @@
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { NAVIGATION_ITEMS } from '~/Data/DummyNavigation';
 import Button from '~/components/ui/Button.vue';
 
 const emit = defineEmits(['openSearch', 'openWishlist', 'openCart']);
 
-const isDesktop = computed(() => window.innerWidth >= 1280);
+const isDesktop = computed(() => typeof window !== 'undefined' ? window.innerWidth >= 1280 : false);
 const openMegaMenuId = ref<number | null>(null);
 const isMobileNavOpen = ref(false);
+const navRef = ref<HTMLElement | null>(null);
 
 const isMegaMenuOpen = (id: number) => openMegaMenuId.value === id;
 
@@ -30,6 +32,25 @@ const toggleMegaMenu = (id: number) => {
   }
 };
 
+const handleClickOutside = (event: MouseEvent) => {
+  if (navRef.value && !navRef.value.contains(event.target as Node)) {
+    closeMegaMenu();
+  }
+};
+
+const route = useRoute();
+watch(() => route.fullPath, () => {
+  closeMegaMenu();
+});
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside);
+});
+
+onUnmounted(() => {
+  document.removeEventListener('click', handleClickOutside);
+});
+
 const cartItemCount = computed(() => 0);
 
 // const openSearchModal: any
@@ -45,7 +66,6 @@ const cartItemCount = computed(() => 0);
         data-testid="desktop-navigation"
         class="mx-auto flex max-w-[1600px] items-center justify-between px-[16px] tablet:px-[30px] desktop:px-[100px]"
       >
-        <!-- Logo -->
         <div class="flex items-center">
           <NuxtLink
             to="/"
@@ -55,30 +75,42 @@ const cartItemCount = computed(() => 0);
             <Logo />
           </NuxtLink>
         </div>
-        <!-- Navigation -->
-        <nav class="hidden flex-1 items-center justify-center gap-[42px] desktop:flex desktop:gap-[60px]">
+        <nav ref="navRef" class="hidden flex-1 items-center justify-center gap-[42px] desktop:flex desktop:gap-[60px]">
           <template v-for="(item, index) in NAVIGATION_ITEMS" :key="item.id">
-            <div v-if="item.children && item.children.length" class="group relative">
-              <button
-                type="button"
-                :aria-expanded="isMegaMenuOpen(item.id)"  
-                :aria-controls="`mega-menu-${item.id}`"
-                :id="`mega-menu-trigger-${item.id}`"
-                @click="toggleMegaMenu(item.id)"
-                @mouseenter="isDesktop ? openMegaMenu(item.id) : undefined"
-                @focus="openMegaMenu(item.id)"
-                @mouseleave="isDesktop ? closeMegaMenu() : undefined"
-                class="flex items-center gap-1 text-xs uppercase tracking-wide text-black hover:text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/50"
-              >
-                {{ item.title }}
-                <Icon
-                  name="chevron-down"
-                  :class="[
-                    'h-4 w-4 transition-transform duration-300',
-                    isMegaMenuOpen(item.id) ? 'rotate-180 text-brand-green' : ''
-                  ]"
-                />
-              </button>
+            <div v-if="item.children && item.children.length" class="relative">
+              <div class="flex items-center gap-1">
+                <NuxtLink
+                  v-if="item.href"
+                  :to="item.href"
+                  class="text-xs uppercase tracking-wide text-black transition-colors duration-300 hover:text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/50"
+                >
+                  {{ item.title }}
+                </NuxtLink>
+                <span
+                  v-else
+                  class="text-xs uppercase tracking-wide text-black transition-colors duration-300 hover:text-brand-green"
+                >
+                  {{ item.title }}
+                </span>
+
+                <button
+                  type="button"
+                  :aria-expanded="isMegaMenuOpen(item.id)"  
+                  :aria-controls="`mega-menu-${item.id}`"
+                  :id="`mega-menu-trigger-${item.id}`"
+                  :aria-label="`Toggle ${item.title} menu`"
+                  @click="toggleMegaMenu(item.id)"
+                  class="flex items-center justify-center p-0.5 text-black transition-colors hover:text-brand-green focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green/50 cursor-pointer"
+                >
+                  <Icon
+                    name="chevron-down"
+                    :class="[
+                      'h-4 w-4 transition-transform duration-300',
+                      isMegaMenuOpen(item.id) ? 'rotate-180 text-brand-green' : ''
+                    ]"
+                  />
+                </button>
+              </div>
               <transition
                 name="fade"
               >

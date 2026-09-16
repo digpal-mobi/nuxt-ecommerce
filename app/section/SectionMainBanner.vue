@@ -1,5 +1,7 @@
 <script setup lang="ts">
+import Button from '~/components/ui/Button.vue';
 import Container from '~/components/ui/Container.vue';
+import LazyImage from '~/components/ui/LazyImage.vue';
 import MainContainer from '~/components/ui/MainContainer.vue';
 import Paragraph from '~/components/ui/Paragraph.vue';
 import TitleTag from '~/components/ui/TitleTag.vue';
@@ -18,12 +20,11 @@ const metrics = [
     <div
       class="hidden laptop:absolute laptop:right-[5%] laptop:bottom-0 laptop:block laptop:h-full laptop:w-[48%]"
     >
-      <NuxtImg
+      <LazyImage
         src="/banner-image.png"
         alt="Banner"
         width="900"
         height="700"
-        preload
         class="h-full w-full object-contain object-right-bottom"
       />
       <div class="absolute right-[1.5%] top-[12.8%]">
@@ -71,7 +72,6 @@ const metrics = [
                 v-for="(item, index) in metrics"
                 :key="item.description"
               >
-                <!-- Metric -->
                 <div
                   :class="
                     index === 2
@@ -103,7 +103,6 @@ const metrics = [
                     </Paragraph>
                   </div>
                 </div>
-                <!-- Divider -->
                 <div
                   v-if="index !== metrics.length - 1"
                   class="hidden h-14 w-px bg-black/10 laptop:block"
@@ -114,21 +113,17 @@ const metrics = [
         </div>
       </Container>
     </MainContainer>
-    <!-- Mobile Banner Image -->
     <div class="relative laptop:hidden">
-      <NuxtImg
+      <LazyImage
         src="/banner-mob-image.png"
         alt="Banner"
         width="700"
         height="448"
-        preload
         class="h-[448px] w-full overflow-hidden object-contain object-bottom"
       />
-      <!-- Top Sparkle -->
       <div class="absolute right-[5%] top-[7%]">
         <Icon name="sparkle-2" class="w-[76px] h-auto laptop:w-[104px]" />
       </div>
-      <!-- Left Sparkle -->
       <div class="absolute left-[7%] top-[28.7%]">
         <Icon name="sparkle" class="w-[44px] h-auto laptop:w-[76px]" />
       </div>

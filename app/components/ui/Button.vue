@@ -17,7 +17,7 @@ withDefaults(defineProps<Props>(), {
 <template>
   <button
     :type="type"
-    :disabled="disabled"
+    :disabled="disabled"  
     :class="['ui-btn', `ui-btn--${variant}`, `ui-btn--${size}`]"
   >
     <slot />
@@ -33,7 +33,6 @@ withDefaults(defineProps<Props>(), {
   font-family: var(--font-family-sans);
   font-weight: 600;
   border-radius: 9999px;
-  border: 1px solid transparent;
   cursor: pointer;
   transition: all var(--transition-fast);
   white-space: nowrap;
@@ -65,6 +64,8 @@ withDefaults(defineProps<Props>(), {
   background-color: var(--color-primary);
   color: var(--color-primary-contrast);
   box-shadow: var(--shadow-primary);
+  border: 1px solid var(--color-primary);
+
 }
 
 .ui-btn--primary:hover:not(:disabled) {
@@ -81,6 +82,8 @@ withDefaults(defineProps<Props>(), {
   background-color: var(--color-secondary);
   color: var(--color-secondary-contrast);
   box-shadow: var(--shadow-secondary);
+  border: 1px solid var(--color-secondary);
+
 }
 
 .ui-btn--secondary:hover:not(:disabled) {
@@ -97,6 +100,7 @@ withDefaults(defineProps<Props>(), {
   background-color: transparent;
   border-color: var(--color-primary);
   color: var(--color-primary);
+  border: 1px solid var(--color-primary);
 }
 
 .ui-btn--outline:hover:not(:disabled) {

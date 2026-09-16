@@ -68,7 +68,7 @@ const displayProducts = computed(() =>
         </div>
 
         <!-- Product Cards Slider / Grid -->
-        <div class="mt-[32px] laptop:mt-[55px] flex gap-[20px] justify-start overflow-x-auto overflow-y-hidden pb-4 scrollbar-hide">
+        <div class="mt-[32px] laptop:mt-[55px] flex gap-[20px] justify-start desktop-lg:justify-center overflow-x-auto overflow-y-hidden pb-4 scrollbar-hide">
           <ProductCard
             v-for="product in displayProducts"
             :key="product.id"

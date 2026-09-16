@@ -9,7 +9,7 @@ export default defineNuxtConfig({
   vite: {
     plugins: [
       tailwindcss(),
-    ],
+      ],
   },
 
   app: {
@@ -17,7 +17,7 @@ export default defineNuxtConfig({
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
         { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' },
-        {
+        { 
           rel: 'stylesheet',
           href: 'https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap'
         }
@@ -25,5 +25,9 @@ export default defineNuxtConfig({
     }
   },
 
-  modules: ['@nuxt/image']
+  modules: ['@nuxt/image', '@pinia/nuxt'],
+
+  pinia: {
+    storesDirs: ['./app/stores/**', './app/pinia/**'],
+  },
 })

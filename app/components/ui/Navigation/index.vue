@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { NAVIGATION_ITEMS } from '~/Data/DummyNavigation';
 import Container from '~/components/ui/Container.vue';
 import MainContainer from '~/components/ui/MainContainer.vue';
@@ -13,6 +14,7 @@ const cartItemCount = ref(0);
 const wishlistCount = ref(0);
 
 const profileMenuRef = ref<HTMLElement | null>(null);
+const desktopNavRef = ref<HTMLElement | null>(null);
 
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value;
@@ -37,7 +39,20 @@ const handleClickOutside = (event: MouseEvent) => {
   ) {
     isProfileMenuOpen.value = false;
   }
+  if (
+    desktopNavRef.value &&
+    !desktopNavRef.value.contains(event.target as Node)
+  ) {
+    activeDropdownId.value = null;
+  }
 };
+
+const route = useRoute();
+watch(() => route.fullPath, () => {
+  activeDropdownId.value = null;
+  isMobileMenuOpen.value = false;
+  isProfileMenuOpen.value = false;
+});
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside);
@@ -79,31 +94,49 @@ onUnmounted(() => {
                 />
               </NuxtLink>
 
-              <nav class="flex items-center gap-6">
+              <nav ref="desktopNavRef" class="flex items-center gap-6">
                 <template v-for="item in NAVIGATION_ITEMS" :key="item.id">
                   <div
                     v-if="item.children && item.children.length"
                     class="relative"
-                    @mouseenter="activeDropdownId = item.id"
-                    @mouseleave="activeDropdownId = null"
                   >
-                    <NuxtLink
-                      :to="item.href"
-                      class="flex items-center gap-1 text-[16px] font-normal text-black transition-colors hover:text-black/70"
-                    >
-                      <span>{{ item.title }}</span>
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        class="h-4 w-4 transition-transform duration-200"
-                        :class="activeDropdownId === item.id ? 'rotate-180' : ''"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2"
+                    <div class="flex items-center gap-1">
+                      <NuxtLink
+                        v-if="item.href"
+                        :to="item.href"
+                        class="text-[16px] font-normal text-black transition-colors hover:text-black/70"
                       >
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                      </svg>
-                    </NuxtLink>
+                        {{ item.title }}
+                      </NuxtLink>
+                      <span
+                        v-else
+                        class="text-[16px] font-normal text-black transition-colors hover:text-black/70"
+                      >
+                        {{ item.title }}
+                      </span>
+
+                      <button
+                        type="button"
+                        :aria-expanded="activeDropdownId === item.id"
+                        :aria-label="`Toggle ${item.title} menu`"
+                        @click.stop="toggleDropdown(item.id)"
+                        @mouseenter="activeDropdownId = item.id"
+                        @mouseleave="activeDropdownId = null"
+                        class="flex items-center p-1 text-black transition-colors hover:text-black/70 cursor-pointer"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          class="h-4 w-4 transition-transform duration-200"
+                          :class="activeDropdownId === item.id ? 'rotate-180' : ''"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          stroke-width="2"
+                        >
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </button>
+                    </div>
 
                     <transition
                       enter-active-class="transition ease-out duration-150"
@@ -122,6 +155,7 @@ onUnmounted(() => {
                           :key="cIdx"
                           :to="child.href"
                           class="block rounded-lg px-4 py-2 text-[14px] text-black transition-colors hover:bg-[#F0F0F0]"
+                          @click="activeDropdownId = null"
                         >
                           {{ child.title }}
                         </NuxtLink>
