@@ -1,19 +1,11 @@
 <script setup lang="ts">
 import Checkbox from "~/components/ui/Checkbox.vue";
 import Paragraph from "~/components/ui/Paragraph.vue";
-import { useFilterStore } from "~/stores/filter";
+import { useCategoryStore, type Category } from '~/pinia/category';
 
-const filterStore = useFilterStore();
-
-// Default categories list (can also accept props if needed)
-const categories = [
-  { name: "Clothing", slug: "clothing" },
-  { name: "Shoes", slug: "shoes" },
-  { name: "Accessories", slug: "accessories" },
-  { name: "Jewelry", slug: "jewelry" },
-  { name: "Bags", slug: "bags" },
-  { name: "Electronics", slug: "electronics" },
-];
+const { filters, toggleCategory } = useFilters();
+const categoryStore = useCategoryStore();
+const categories = computed(() => categoryStore.categories);
 </script>
 
 <template>
@@ -22,15 +14,15 @@ const categories = [
       <div
         v-for="item in categories"
         :key="item.slug"
-        @click="filterStore.toggleCategory(item.slug)"
+        @click="toggleCategory(item.slug)"
         role="checkbox"
-        :aria-checked="filterStore.categories.includes(item.slug.toLowerCase())"
+        :aria-checked="filters.categories.includes(item.slug.toLowerCase())"
         tabindex="0"
-        @keydown.space.prevent="filterStore.toggleCategory(item.slug)"
+        @keydown.space.prevent="toggleCategory(item.slug)"
         class="flex cursor-pointer items-center gap-[10px] text-left transition hover:opacity-80"
       >
         <Checkbox
-          :model-value="filterStore.categories.includes(item.slug.toLowerCase())"
+          :model-value="filters.categories.includes(item.slug.toLowerCase())"
           class="pointer-events-none"
         />
         <Paragraph

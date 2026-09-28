@@ -2,7 +2,6 @@
 import TitleTag from "~/components/ui/TitleTag.vue";
 import Icons from "~/utils/Icons.vue";
 import FilterList from "~/components/Filters/FilterList.vue";
-import { useFilterStore } from "~/stores/filter";
 
 interface Props {
   isOpen?: boolean;
@@ -16,7 +15,7 @@ const emit = defineEmits<{
   (e: "close"): void;
 }>();
 
-const filterStore = useFilterStore();
+const { filters: filterStore, resetFilters } = useFilters();
 </script>
 
 <template>
@@ -64,7 +63,7 @@ const filterStore = useFilterStore();
             <button
               v-if="filterStore.hasActiveFilters"
               type="button"
-              @click="filterStore.clearFilters()"
+              @click="resetFilters()"
               class="cursor-pointer font-satoshi text-[12px] font-semibold text-red-500 hover:underline"
             >
               Clear All

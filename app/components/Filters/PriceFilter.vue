@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import Paragraph from "~/components/ui/Paragraph.vue";
-import { useFilterStore, DEFAULT_MIN_PRICE, DEFAULT_MAX_PRICE } from "~/stores/filter";
+import { DEFAULT_MIN_PRICE, DEFAULT_MAX_PRICE } from "~/pinia/filter";
 
-const filterStore = useFilterStore();
+const { filters: filterStore, setPriceRange } = useFilters();
 const minLimit = DEFAULT_MIN_PRICE;
 const maxLimit = DEFAULT_MAX_PRICE;
 
@@ -21,26 +21,26 @@ const progressWidth = computed(() => {
 const onMinSliderChange = (event: Event) => {
   const val = Number((event.target as HTMLInputElement).value);
   const newMin = Math.min(val, filterStore.maxPrice);
-  filterStore.setPriceRange(newMin, filterStore.maxPrice);
+  setPriceRange(newMin, filterStore.maxPrice);
 };
 
 const onMaxSliderChange = (event: Event) => {
   const val = Number((event.target as HTMLInputElement).value);
   const newMax = Math.max(val, filterStore.minPrice);
-  filterStore.setPriceRange(filterStore.minPrice, newMax);
+  setPriceRange(filterStore.minPrice, newMax);
 };
 
 const onMinInputChange = (event: Event) => {
   const val = Number((event.target as HTMLInputElement).value);
   if (!Number.isNaN(val)) {
-    filterStore.setPriceRange(val, filterStore.maxPrice);
+    setPriceRange(val, filterStore.maxPrice);
   }
 };
 
 const onMaxInputChange = (event: Event) => {
   const val = Number((event.target as HTMLInputElement).value);
   if (!Number.isNaN(val)) {
-    filterStore.setPriceRange(filterStore.minPrice, val);
+    setPriceRange(filterStore.minPrice, val);
   }
 };
 </script>

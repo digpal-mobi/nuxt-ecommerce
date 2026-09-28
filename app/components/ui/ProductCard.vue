@@ -125,7 +125,6 @@ const handleAddToCart = () => {
       </div>
     </div>
 
-    <!-- Actions (Quantity & Add to Cart) -->
     <div class="mt-[16px] flex w-full items-center gap-[10px]">
       <Increment
         :value="quantity"

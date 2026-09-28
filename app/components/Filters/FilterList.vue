@@ -5,10 +5,14 @@ import Icons from "~/utils/Icons.vue";
 import PriceFilter from "~/components/Filters/PriceFilter.vue";
 import CategoryFilter from "~/components/Filters/CategoryFilter.vue";
 import FilterOptions from "~/components/Filters/FilterOptions.vue";
-import { useFilterStore } from "~/stores/filter";
 
-const filterStore = useFilterStore();
 const openSections = ref<string[]>(["Price", "Category", "Brand", "Rating"]);
+
+const {
+  filters,
+  toggleBrand,
+  setRating,
+} = useFilters();
 
 const toggleSection = (name: string) => {
   if (openSections.value.includes(name)) {
@@ -97,8 +101,8 @@ const ratingOptions = [
       <div v-show="openSections.includes('Brand')">
         <FilterOptions
           :options="brandOptions"
-          :selected-values="filterStore.brands"
-          @select="(val) => filterStore.toggleBrand(String(val))"
+          :selected-values="filters.brands"
+          @select="(val) => toggleBrand(String(val))"
         />
       </div>
     </div>
@@ -124,8 +128,8 @@ const ratingOptions = [
       <div v-show="openSections.includes('Rating')">
         <FilterOptions
           :options="ratingOptions"
-          :selected-values="filterStore.rating !== null ? [filterStore.rating] : []"
-          @select="(val) => filterStore.setRating(Number(val))"
+          :selected-values="filters.rating !== null ? [filters.rating] : []"
+          @select="(val) => setRating(Number(val))"
         />
       </div>
     </div>

@@ -3,16 +3,35 @@ import { computed } from 'vue';
 import ProductCard from '~/components/ui/ProductCard.vue';
 import TitleTag from '~/components/ui/TitleTag.vue';
 import Paragraph from '~/components/ui/Paragraph.vue';
-import { useFilterStore } from '~/stores/filter';
 import type { Product } from '~/types/product';
+import Pagination from '~/components/ui/Pagination.vue';
+import Icons from '~/utils/Icons.vue';
 
-const filterStore = useFilterStore();
+const {
+  filters: filterStore,
+  toggleCategory,
+  toggleBrand,
+  setPriceRange,
+  setRating,
+  resetFilters,
+} = useFilters();
+
+const filterPayload = computed(() => ({
+  categories: filterStore.categories.join(','),
+  brands: filterStore.brands.join(','),
+  rating: filterStore.rating,
+  minPrice: filterStore.minPrice,
+  maxPrice: filterStore.maxPrice,
+}));
 
 const { data, status } = await useFetch<{ products: any[] }>(
-  'https://dummyjson.com/products?limit=50'
+  'https://dummyjson.com/products?limit=9',
+  {
+    query: filterPayload
+  }
 );
 
-const allProducts = computed<Product[]>(() => {
+const allProducts = computed<Product[]  >(() => {
   if (!data.value?.products) return [];
   return data.value.products.map((p) => ({
     id: p.id,
@@ -25,25 +44,24 @@ const allProducts = computed<Product[]>(() => {
     category: p.category,
     brand: p.brand,
     stock: p.stock,
-  }));
+  }));    
 });
 
 const categoryMatches = (productCategory: string, selectedSlug: string): boolean => {
-  const pCat = (productCategory || '').toLowerCase();
+  const prodCat = (productCategory || '').toLowerCase();
   const slug = (selectedSlug || '').toLowerCase();
-  if (pCat === slug || pCat.includes(slug)) return true;
-  if (slug === 'clothing' && (pCat.includes('shirt') || pCat.includes('dress') || pCat.includes('top'))) return true;
-  if (slug === 'shoes' && pCat.includes('shoe')) return true;
-  if (slug === 'accessories' && (pCat.includes('accessories') || pCat.includes('sunglasses') || pCat.includes('watch'))) return true;
-  if (slug === 'jewelry' && (pCat.includes('jewel') || pCat.includes('watch'))) return true;
-  if (slug === 'bags' && pCat.includes('bag')) return true;
-  if (slug === 'electronics' && (pCat.includes('phone') || pCat.includes('laptop') || pCat.includes('tablet'))) return true;
+  if (prodCat === slug || prodCat.includes(slug)) return true;
+  if (slug === 'clothing' && (prodCat.includes('shirt') || prodCat.includes('dress') || prodCat.includes('top'))) return true;
+  if (slug === 'shoes' && prodCat.includes('shoe')) return true;
+  if (slug === 'accessories' && (prodCat.includes('accessories') || prodCat.includes('sunglasses') || prodCat.includes('watch'))) return true;
+  if (slug === 'jewelry' && (prodCat.includes('jewel') || prodCat.includes('watch'))) return true;
+  if (slug === 'bags' && prodCat.includes('bag')) return true;
+  if (slug === 'electronics' && (prodCat.includes('phone') || prodCat.includes('laptop') ||  prodCat.includes('tablet'))) return true;
   return false;
 };
 
 const filteredProducts = computed(() => {
   return allProducts.value.filter((product) => {
-    // 1. Category Filter
     if (filterStore.categories.length > 0) {
       const match = filterStore.categories.some((cat) =>
         categoryMatches(product.category || '', cat)
@@ -51,7 +69,6 @@ const filteredProducts = computed(() => {
       if (!match) return false;
     }
 
-    // 2. Brand Filter
     if (filterStore.brands.length > 0) {
       const pBrand = (product as any).brand?.toLowerCase() || '';
       const match = filterStore.brands.some((b) =>
@@ -60,12 +77,10 @@ const filteredProducts = computed(() => {
       if (!match) return false;
     }
 
-    // 3. Price Filter
     if (product.price < filterStore.minPrice || product.price > filterStore.maxPrice) {
       return false;
     }
 
-    // 4. Rating Filter
     if (filterStore.rating !== null) {
       if (!product.rating || product.rating < filterStore.rating) {
         return false;
@@ -79,7 +94,6 @@ const filteredProducts = computed(() => {
 
 <template>
   <div class="w-full">
-    <!-- Header with product count and active filters -->
     <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
       <div>
         <TitleTag as="h1" variant="bold" class="!text-[24px] laptop:!text-[28px] text-[#111111]">
@@ -90,7 +104,6 @@ const filteredProducts = computed(() => {
         </Paragraph>
       </div>
 
-      <!-- Active filter badges -->
       <div v-if="filterStore.hasActiveFilters" class="flex flex-wrap items-center gap-2">
         <span
           v-for="cat in filterStore.categories"
@@ -100,7 +113,7 @@ const filteredProducts = computed(() => {
           {{ cat }}
           <button
             type="button"
-            @click="filterStore.toggleCategory(cat)"
+            @click="toggleCategory(cat)"
             class="hover:text-red-500 font-bold ml-1 cursor-pointer"
           >
             ×
@@ -115,7 +128,7 @@ const filteredProducts = computed(() => {
           {{ b }}
           <button
             type="button"
-            @click="filterStore.toggleBrand(b)"
+            @click="toggleBrand(b)"
             class="hover:text-red-500 font-bold ml-1 cursor-pointer"
           >
             ×
@@ -129,10 +142,10 @@ const filteredProducts = computed(() => {
           ${{ filterStore.minPrice }} - ${{ filterStore.maxPrice }}
           <button
             type="button"
-            @click="filterStore.setPriceRange(0, 1000)"
+            @click="setPriceRange(0, 1000)"
             class="hover:text-red-500 font-bold ml-1 cursor-pointer"
           >
-            ×
+            <Icons name="crossIcon" :size="12" color="#000000" />
           </button>
         </span>
 
@@ -143,16 +156,16 @@ const filteredProducts = computed(() => {
           {{ filterStore.rating }}★ & above
           <button
             type="button"
-            @click="filterStore.setRating(null)"
+            @click="setRating(null)"
             class="hover:text-red-500 font-bold ml-1 cursor-pointer"
           >
-            ×
+            <Icons name="crossIcon" :size="12" color="#000000" />
           </button>
         </span>
 
         <button
           type="button"
-          @click="filterStore.clearFilters()"
+          @click="resetFilters()"
           class="text-xs font-semibold text-red-500 hover:underline cursor-pointer ml-1"
         >
           Reset
@@ -160,7 +173,6 @@ const filteredProducts = computed(() => {
       </div>
     </div>
 
-    <!-- Loading State -->
     <div v-if="status === 'pending'" class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       <div
         v-for="i in 6"
@@ -169,10 +181,9 @@ const filteredProducts = computed(() => {
       />
     </div>
 
-    <!-- Product Grid -->
     <div
       v-else-if="filteredProducts.length > 0"
-      class="grid grid-cols-1 justify-items-center gap-6 sm:grid-cols-2 lg:grid-cols-3"
+      class="grid grid-cols-1 justify-items-center gap-[20px] sm:grid-cols-2 lg:grid-cols-3"
     >
       <ProductCard
         v-for="product in filteredProducts"
@@ -180,14 +191,12 @@ const filteredProducts = computed(() => {
         :product="product"
       />
     </div>
-
-    <!-- Empty State -->
     <div
       v-else
       class="flex flex-col items-center justify-center rounded-[20px] border border-dashed border-gray-200 py-16 text-center"
     >
       <div class="mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-gray-100 text-2xl">
-        🔍
+        <Icons name="searchIcon" :size="20" color="#000000" />
       </div>
       <TitleTag as="h3" variant="bold" class="!text-[18px] text-gray-800">
         No products match your filters
@@ -197,11 +206,13 @@ const filteredProducts = computed(() => {
       </Paragraph>
       <button
         type="button"
-        @click="filterStore.clearFilters()"
+        @click="resetFilters()"
         class="mt-4 rounded-full bg-black px-5 py-2.5 text-xs font-semibold text-white transition hover:bg-neutral-800 cursor-pointer"
       >
         Clear All Filters
       </button>
     </div>
+
+    <Pagination />
   </div>
 </template>

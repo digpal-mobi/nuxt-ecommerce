@@ -2,21 +2,20 @@
 import { ref } from "vue";
 import FilterDesktop from "~/components/Filters/FilterDesktop.vue";
 import FilterMobile from "~/components/Filters/FilterMobile.vue";
+import { useFilterStore } from "~/pinia/filter";
 import Icons from "~/utils/Icons.vue";
-import { useFilterStore } from "~/stores/filter";
 
 const filterStore = useFilterStore();
+
 const isMobileOpen = ref(false);
 </script>
 
 <template>
   <div>
-    <!-- Desktop View -->
     <div class="hidden shrink-0 laptop:block">
       <FilterDesktop />
     </div>
 
-    <!-- Mobile View -->
     <div class="w-full laptop:hidden">
       <button
         type="button"
@@ -26,7 +25,7 @@ const isMobileOpen = ref(false);
         <Icons name="filter" :size="16" color="#000000" />
         <span>Filters</span>
         <span
-          v-if="filterStore.activeFilterCount > 0"
+         v-if="filterStore.activeFilterCount > 0"
           class="flex h-5 w-5 items-center justify-center rounded-full bg-black text-[11px] font-bold text-white ml-1"
         >
           {{ filterStore.activeFilterCount }}

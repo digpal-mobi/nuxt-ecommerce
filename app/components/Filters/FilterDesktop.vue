@@ -2,9 +2,8 @@
 import TitleTag from "~/components/ui/TitleTag.vue";
 import Icons from "~/utils/Icons.vue";
 import FilterList from "~/components/Filters/FilterList.vue";
-import { useFilterStore } from "~/stores/filter";
 
-const filterStore = useFilterStore();
+const { filters: filterStore, resetFilters } = useFilters();
 </script>
 
 <template>
@@ -34,7 +33,7 @@ const filterStore = useFilterStore();
         <button
           v-if="filterStore.hasActiveFilters"
           type="button"
-          @click="filterStore.clearFilters()"
+          @click="resetFilters()"
           class="cursor-pointer font-satoshi text-[12px] font-semibold text-red-500 hover:underline transition-opacity"
         >
           Clear All
@@ -43,7 +42,7 @@ const filterStore = useFilterStore();
           class="flex h-[28px] w-[28px] items-center justify-center rounded-full bg-[#F5F5F5]"
           aria-label="Filters"
         >
-          <Icons name="filter" :size="15" color="#555555" />
+          <Icons name="filtersIcon" :size="15" color="#555555" />
         </div>
       </div>
     </div>
