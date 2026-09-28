@@ -7,6 +7,7 @@ import SectionFilter from '~/section/SectionFilter.vue';
 import SectionProductList from '~/section/SectionProductList.vue';
 
 useFilterStore();
+await useCategories();
 
 useHead({
   title: 'SHOP.CO | Find Clothes That Matches Your Style',

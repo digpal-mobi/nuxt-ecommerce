@@ -24,14 +24,21 @@ const filterPayload = computed(() => ({
   maxPrice: filterStore.maxPrice,
 }));
 
-const { data, status } = await useFetch<{ products: any[] }>(
+interface ProductsResponse {
+  products: any[];
+  total: number;
+  skip: number;
+  limit: number;
+}
+
+const { data, status } = await useFetch<ProductsResponse>(
   'https://dummyjson.com/products?limit=9',
   {
     query: filterPayload
   }
 );
 
-const allProducts = computed<Product[]  >(() => {
+const allProducts = computed<Product[]>(() => {
   if (!data.value?.products) return [];
   return data.value.products.map((p) => ({
     id: p.id,
@@ -46,50 +53,6 @@ const allProducts = computed<Product[]  >(() => {
     stock: p.stock,
   }));    
 });
-
-const categoryMatches = (productCategory: string, selectedSlug: string): boolean => {
-  const prodCat = (productCategory || '').toLowerCase();
-  const slug = (selectedSlug || '').toLowerCase();
-  if (prodCat === slug || prodCat.includes(slug)) return true;
-  if (slug === 'clothing' && (prodCat.includes('shirt') || prodCat.includes('dress') || prodCat.includes('top'))) return true;
-  if (slug === 'shoes' && prodCat.includes('shoe')) return true;
-  if (slug === 'accessories' && (prodCat.includes('accessories') || prodCat.includes('sunglasses') || prodCat.includes('watch'))) return true;
-  if (slug === 'jewelry' && (prodCat.includes('jewel') || prodCat.includes('watch'))) return true;
-  if (slug === 'bags' && prodCat.includes('bag')) return true;
-  if (slug === 'electronics' && (prodCat.includes('phone') || prodCat.includes('laptop') ||  prodCat.includes('tablet'))) return true;
-  return false;
-};
-
-const filteredProducts = computed(() => {
-  return allProducts.value.filter((product) => {
-    if (filterStore.categories.length > 0) {
-      const match = filterStore.categories.some((cat) =>
-        categoryMatches(product.category || '', cat)
-      );
-      if (!match) return false;
-    }
-
-    if (filterStore.brands.length > 0) {
-      const pBrand = (product as any).brand?.toLowerCase() || '';
-      const match = filterStore.brands.some((b) =>
-        pBrand.includes(b.toLowerCase())
-      );
-      if (!match) return false;
-    }
-
-    if (product.price < filterStore.minPrice || product.price > filterStore.maxPrice) {
-      return false;
-    }
-
-    if (filterStore.rating !== null) {
-      if (!product.rating || product.rating < filterStore.rating) {
-        return false;
-      }
-    }
-
-    return true;
-  });
-});
 </script>
 
 <template>
@@ -100,7 +63,7 @@ const filteredProducts = computed(() => {
           Casual
         </TitleTag>
         <Paragraph variant="normalPara" class="!text-[14px] !text-[#777777]">
-          Showing {{ filteredProducts.length }} of {{ allProducts.length }} Products
+          Showing 1-{{ data?.products?.length || data?.limit || 0 }} of {{ data?.total || 0 }} Products
         </Paragraph>
       </div>
 
@@ -182,11 +145,11 @@ const filteredProducts = computed(() => {
     </div>
 
     <div
-      v-else-if="filteredProducts.length > 0"
+      v-else-if="allProducts.length > 0"
       class="grid grid-cols-1 justify-items-center gap-[20px] sm:grid-cols-2 lg:grid-cols-3"
     >
       <ProductCard
-        v-for="product in filteredProducts"
+        v-for="product in allProducts"
         :key="product.id"
         :product="product"
       />

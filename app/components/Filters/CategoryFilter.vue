@@ -1,11 +1,9 @@
 <script setup lang="ts">
 import Checkbox from "~/components/ui/Checkbox.vue";
 import Paragraph from "~/components/ui/Paragraph.vue";
-import { useCategoryStore, type Category } from '~/pinia/category';
 
 const { filters, toggleCategory } = useFilters();
-const categoryStore = useCategoryStore();
-const categories = computed(() => categoryStore.categories);
+const { categories } = await useCategories();
 </script>
 
 <template>
