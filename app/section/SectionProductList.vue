@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, watchEffect } from 'vue';
 import ProductCard from '~/components/ui/ProductCard.vue';
 import TitleTag from '~/components/ui/TitleTag.vue';
 import Paragraph from '~/components/ui/Paragraph.vue';
 import type { Product } from '~/types/product';
 import Pagination from '~/components/ui/Pagination.vue';
 import Icons from '~/utils/Icons.vue';
+import { usePaginationStore } from '~/pinia/pagination';
+import { storeToRefs } from 'pinia';
 
 const {
   filters: filterStore,
@@ -16,6 +18,25 @@ const {
   resetFilters,
 } = useFilters();
 
+const route = useRoute();
+const router = useRouter(); 
+
+const paginationStore = usePaginationStore();
+const { currentPage, total } = storeToRefs(paginationStore);
+
+const pageChange = async (page: number) => {
+  paginationStore.setCurrentPage(page);
+
+  await router.replace({
+    query: {
+      ...route.query,
+      page: String(page),
+    },
+  });
+};
+
+const limit = 9;
+
 const filterPayload = computed(() => ({
   categories: filterStore.categories.join(','),
   brands: filterStore.brands.join(','),
@@ -24,19 +45,54 @@ const filterPayload = computed(() => ({
   maxPrice: filterStore.maxPrice,
 }));
 
-interface ProductsResponse {
-  products: any[];
-  total: number;
-  skip: number;
-  limit: number;
-}
-
-const { data, status } = await useFetch<ProductsResponse>(
-  'https://dummyjson.com/products?limit=9',
-  {
-    query: filterPayload
-  }
+const { data, status } = await apiProducts.getProducts(() => ({
+  categories: filterStore.categories.join(','),
+  brands: filterStore.brands.join(','),
+  rating: filterStore.rating,
+  minPrice: filterStore.minPrice,
+  maxPrice: filterStore.maxPrice,
+  limit,
+  skip: (currentPage.value - 1) * limit,
+}));
+// 2. Reset page to 1 when filters change
+watch(
+  [
+    () => filterStore.categories,
+    () => filterStore.brands,
+    () => filterStore.minPrice,
+    () => filterStore.maxPrice,
+    () => filterStore.rating,
+  ],
+  () => {
+    paginationStore.setCurrentPage(1);
+  },
+  { deep: true }
 );
+
+// Fetch whenever page changes
+watch(currentPage, async (page) => {
+  const result = await $apiFetch<ProductsResponse>(API_ENDPOINTS.PRODUCTS.LIST, {
+    query: {
+      categories: filterStore.categories.join(','),
+      brands: filterStore.brands.join(','),
+      rating: filterStore.rating,
+      minPrice: filterStore.minPrice,
+      maxPrice: filterStore.maxPrice,
+      limit,
+      skip: (page - 1) * limit,
+    },
+  });
+  data.value = result;
+});
+
+
+watchEffect(() => {
+  if (data.value) {
+    paginationStore.setLimit(data.value.limit);
+    paginationStore.setTotal(Math.ceil(data.value.total / data.value.limit));
+  }
+});
+  
 
 const allProducts = computed<Product[]>(() => {
   if (!data.value?.products) return [];
@@ -51,7 +107,16 @@ const allProducts = computed<Product[]>(() => {
     category: p.category,
     brand: p.brand,
     stock: p.stock,
-  }));    
+  })); 
+     
+});
+
+const startProduct = computed(() => {
+  return (currentPage.value - 1) * limit + 1;
+});
+
+const endProduct = computed(() => {
+  return Math.min(currentPage.value * limit, data.value?.total || 0);
 });
 </script>
 
@@ -63,7 +128,7 @@ const allProducts = computed<Product[]>(() => {
           Casual
         </TitleTag>
         <Paragraph variant="normalPara" class="!text-[14px] !text-[#777777]">
-          Showing 1-{{ data?.products?.length || data?.limit || 0 }} of {{ data?.total || 0 }} Products
+          Showing {{ startProduct }}-{{ endProduct }} of {{ data?.total || 0 }} Products
         </Paragraph>
       </div>
 
@@ -176,6 +241,8 @@ const allProducts = computed<Product[]>(() => {
       </button>
     </div>
 
-    <Pagination />
+    <div class="laptop:mt-[60px] mt-[30px]">
+      <Pagination :total="total" :current-page="currentPage" @page-change="pageChange" />
+    </div>
   </div>
 </template>

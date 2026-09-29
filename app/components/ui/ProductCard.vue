@@ -8,6 +8,8 @@ import Button from '~/components/ui/Button.vue';
 import Increment from '~/components/ui/Increment.vue';
 import SectionRating from '~/components/ui/SectionRating.vue';
 import { ConvertToFinalPrice, CurrencyConverter } from '~/utils/currency';
+import { useCartStore } from '~/pinia/cart';
+import Icons from '~/utils/Icons.vue';
 
 interface Props {
   product: Product;
@@ -22,10 +24,12 @@ const props = withDefaults(defineProps<Props>(), {
   quantity: 1,
 });
 
+const cartStore = useCartStore();
+
 const emit = defineEmits<{
   (e: 'toggleWishlist', event: MouseEvent, product: Product): void;
   (e: 'quantityChange', quantity: number, product: Product): void;
-  (e: 'addToCart', product: Product): void;
+  (e: 'addToCart', product: Product, quantity?: number): void;
 }>();
 
 const discount = computed(() => Number(props.product.discountPercentage ?? 0));
@@ -39,14 +43,14 @@ const finalPrice = computed(() =>
 const handleToggleWishlist = (e: MouseEvent) => {
   e.preventDefault();
   emit('toggleWishlist', e, props.product);
-};
+};  
 
 const handleQuantityChange = (qty: number) => {
   emit('quantityChange', qty, props.product);
 };
 
 const handleAddToCart = () => {
-  emit('addToCart', props.product);
+  cartStore.addToCart(props.product, props.quantity);
 };
 </script>
 
@@ -137,21 +141,7 @@ const handleAddToCart = () => {
         class="flex-1 gap-[8px] whitespace-nowrap !px-[14px] !py-[12px]"
         @click="handleAddToCart"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-[18px] w-[18px]"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-          />
-        </svg>
-
+        <Icons name="cartsIcon" :size="18" />
         <TitleTag
           as="span"
           variant="satoshiBold"

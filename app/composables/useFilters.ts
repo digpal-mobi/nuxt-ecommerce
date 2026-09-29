@@ -1,4 +1,5 @@
 import { useFilterStore, DEFAULT_MIN_PRICE, DEFAULT_MAX_PRICE } from "~/pinia/filter";
+import { usePaginationStore } from "~/pinia/pagination";
 import { getFiltersFromQuery } from "~/utils/productUrl";
 
 let debounceTimer: ReturnType<typeof setTimeout> | null = null;
@@ -41,6 +42,7 @@ const useFilters = () => {
     return true;
   };
 
+
   const syncFiltersFromUrl = () => {
     const queryFilters = getFiltersFromQuery(route.query);
     const currentFilters = {
@@ -50,6 +52,7 @@ const useFilters = () => {
       maxPrice: filterStore.maxPrice,
       rating: filterStore.rating,
     };
+
 
     if (!areFiltersEqual(currentFilters, queryFilters)) {
       filterStore.setFilters(queryFilters);
