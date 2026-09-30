@@ -5,13 +5,13 @@ import { NAVIGATION_ITEMS } from '~/Data/DummyNavigation';
 import Container from '~/components/ui/Container.vue';
 import MainContainer from '~/components/ui/MainContainer.vue';
 import LazyImage from '~/components/ui/LazyImage.vue';
+import Icons from '~/utils/Icons.vue';
+import { useCartStore } from '~/pinia/cart';
 
 const isMobileMenuOpen = ref(false);
 const isProfileMenuOpen = ref(false);
 const activeDropdownId = ref<number | null>(null);
 const searchQuery = ref('');
-const cartItemCount = ref(0);
-const wishlistCount = ref(0);
 
 const profileMenuRef = ref<HTMLElement | null>(null);
 const desktopNavRef = ref<HTMLElement | null>(null);
@@ -31,6 +31,8 @@ const toggleProfileMenu = () => {
 const toggleDropdown = (id: number) => {
   activeDropdownId.value = activeDropdownId.value === id ? null : id;
 };
+
+const wishlistCount = computed(() => cart.wishlistQuantity);
 
 const handleClickOutside = (event: MouseEvent) => {
   if (
@@ -61,6 +63,12 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside);
 });
+
+const cart = useCartStore();
+
+const cartItemCount = computed(() => cart.totalQuantity);
+// const wishlistCount = computed(() => cart.wishlist.length);
+
 </script>
 
 <template>
@@ -195,35 +203,29 @@ onUnmounted(() => {
                   aria-label="Wishlist"
                   class="relative p-1 text-black transition-transform hover:scale-110"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-                  </svg>
+                 <Icons name="heartIcon" :size="20" />
                   <span
                     v-if="wishlistCount > 0"
-                    class="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white"
+                    class="absolute -right-[1px] -top-[1px] flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white"
                   >
                     {{ wishlistCount }}
                   </span>
                 </NuxtLink>
 
-                <!-- Cart -->
-                <NuxtLink
-                  to="/cart"
+                <div
                   aria-label="Shopping Cart"
                   class="relative p-1 text-black transition-transform hover:scale-110"
+                  @click="cart.toggleMiniCart"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
+                  <Icons name="cartsIcon" :size="21" />
                   <span
                     v-if="cartItemCount > 0"
                     class="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-black text-[10px] font-bold text-white"
                   >
                     {{ cartItemCount }}
                   </span>
-                </NuxtLink>
+                </div>
 
-                <!-- User Profile Dropdown -->
                 <div ref="profileMenuRef" class="relative">
                   <button
                     type="button"

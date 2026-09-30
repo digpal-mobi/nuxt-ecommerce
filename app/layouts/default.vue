@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import Navigation from '~/components/ui/Navigation/index.vue';
 import FooterNavigation from '~/components/ui/FooterNavigation/index.vue';
+import SectionMiniCart from '~/section/SectionMiniCart.vue';
 </script>
 
 <template>
@@ -10,6 +11,7 @@ import FooterNavigation from '~/components/ui/FooterNavigation/index.vue';
       <slot />
     </div>
     <FooterNavigation />
+    <SectionMiniCart/>
   </div>
 </template>
 

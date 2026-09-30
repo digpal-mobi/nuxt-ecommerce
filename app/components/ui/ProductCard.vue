@@ -8,6 +8,8 @@ import Button from '~/components/ui/Button.vue';
 import Increment from '~/components/ui/Increment.vue';
 import SectionRating from '~/components/ui/SectionRating.vue';
 import { ConvertToFinalPrice, CurrencyConverter } from '~/utils/currency';
+import { useCartStore } from '~/pinia/cart';
+import Icons from '~/utils/Icons.vue';
 
 interface Props {
   product: Product;
@@ -22,10 +24,12 @@ const props = withDefaults(defineProps<Props>(), {
   quantity: 1,
 });
 
+const cartStore = useCartStore();
+
 const emit = defineEmits<{
   (e: 'toggleWishlist', event: MouseEvent, product: Product): void;
   (e: 'quantityChange', quantity: number, product: Product): void;
-  (e: 'addToCart', product: Product): void;
+  (e: 'addToCart', product: Product, quantity?: number): void;
 }>();
 
 const discount = computed(() => Number(props.product.discountPercentage ?? 0));
@@ -36,57 +40,56 @@ const finalPrice = computed(() =>
     : props.product.price
 );
 
+const isWishlisted = computed(() =>
+  Boolean(props.isWishlisted || cartStore.wishlistedItems.some((item) => item.id === props.product.id))
+);
+
 const handleToggleWishlist = (e: MouseEvent) => {
-  e.preventDefault();
-  emit('toggleWishlist', e, props.product);
-};
+  cartStore.toggleWishlist(props.product);
+};  
 
 const handleQuantityChange = (qty: number) => {
   emit('quantityChange', qty, props.product);
 };
 
 const handleAddToCart = () => {
-  emit('addToCart', props.product);
+  cartStore.addToCart(props.product, props.quantity);
 };
 </script>
 
 <template>
   <div class="flex w-[295px] shrink-0 flex-col justify-between">
-    <NuxtLink
-      :to="`/shop/${product.id}`"
-      :aria-label="`View details for ${product.title}`"
-      class="relative block"
-    >
-      <LazyImage
-        :src="product.thumbnail"
-        :width="295"
-        :height="298"
-        :alt="product.title"
-        class="h-auto max-h-[298px] w-full cursor-pointer rounded-[20px] bg-[#F0EEED] object-cover transition-all hover:scale-[1.05]"
-      />
+<NuxtLink
+  :to="`/shop/${product.id}`"
+  :aria-label="`View details for ${product.title}`"
+  class="relative block"
+>
+  <LazyImage
+    :src="product.thumbnail"
+    :width="295"
+    :height="298"
+    :alt="product.title"
+    class="h-auto max-h-[298px] w-full cursor-pointer rounded-[20px] bg-[#F0EEED] object-cover transition-all hover:scale-[1.05]"
+  />
 
-      <div class="absolute right-3 top-3 z-10">
-        <button
-          type="button"
-          :aria-label="isWishlisted ? 'Remove from Wishlist' : 'Add to Wishlist'"
-          class="flex h-9 w-9 items-center justify-center rounded-full bg-white/80 shadow-md backdrop-blur-sm transition-all hover:scale-110 hover:bg-white"
-          @click="handleToggleWishlist"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-[18px] w-[18px] cursor-pointer transition-colors"
-            :class="isWishlisted ? 'text-red-500 fill-red-500' : 'text-gray-700 fill-none stroke-current stroke-2'"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
-            />
-          </svg>
-        </button>
-      </div>
-    </NuxtLink>
+  <div class="absolute right-3 top-3 z-10">
+    <button
+      type="button"
+      :aria-label="
+        isWishlisted
+          ? 'Remove from Wishlist'
+          : 'Add to Wishlist'
+      "
+      class="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-white/80 shadow-md backdrop-blur-sm transition-all hover:scale-110 hover:bg-white"
+      @click.stop.prevent="handleToggleWishlist"
+    >
+      <Icons
+        name="wishlistIcon"
+        :is-wishlisted="isWishlisted"
+      />
+    </button>
+  </div>
+</NuxtLink>
 
     <!-- Product Info -->
     <div class="mt-[16px] flex flex-col items-start">
@@ -137,21 +140,7 @@ const handleAddToCart = () => {
         class="flex-1 gap-[8px] whitespace-nowrap !px-[14px] !py-[12px]"
         @click="handleAddToCart"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-[18px] w-[18px]"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
-          />
-        </svg>
-
+        <Icons name="cartsIcon" :size="18" />
         <TitleTag
           as="span"
           variant="satoshiBold"

@@ -12,6 +12,12 @@ export default defineNuxtConfig({
       ],
   },
 
+  runtimeConfig: {
+    public: {
+      baseUrl: process.env.BASE_URL || 'https://dummyjson.com/',
+    },
+  },
+
   app: {
     head: {
       link: [

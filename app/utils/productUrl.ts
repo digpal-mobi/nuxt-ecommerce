@@ -6,6 +6,12 @@ export interface UrlFilters {
     rating: number | null;
 }
 
+export interface UrlPagination {
+  page: number;
+}
+
+const DEFAULT_PAGE = 1;
+
 const DEFAULT_MIN_PRICE = 0;
 const DEFAULT_MAX_PRICE = 1000;
 
@@ -33,3 +39,14 @@ export const getFiltersFromQuery = (query: Record<string, any>):UrlFilters => {
         : null,
     }
 }
+
+export const getPaginationFromQuery = (
+  query: Record<string, any>
+): UrlPagination => {
+  return {
+    page:
+      typeof query.page === 'string'
+        ? Math.max(1, parseInt(query.page, 10))
+        : DEFAULT_PAGE,
+  };
+};
