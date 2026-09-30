@@ -3,11 +3,13 @@ interface Props {
   name: string;
   size?: number | string;
   color?: string;
+  isWishlisted?: boolean;
 }
 
 withDefaults(defineProps<Props>(), {
   size: 18,
   color: "currentColor",
+  isWishlisted: false,
 });
 </script>
 
@@ -126,17 +128,13 @@ withDefaults(defineProps<Props>(), {
           <mask id="cross-b" fill="#ffffff">
             <use xlink:href="#cross-a"></use>
           </mask>
-          <use fill="#D8D8D8" fill-rule="nonzero" xlink:href="#cross-a"></use>
-          <g fill="#FFA0A0" mask="url(#cross-b)">
-            <rect width="24" height="24" transform="translate(-8 -6)"></rect>
-          </g>
         </g>
         <g transform="rotate(-90 12 5)">
           <mask id="cross-d" fill="#ffffff">
             <use xlink:href="#cross-c"></use>
           </mask>
           <use fill="#000000" fill-rule="nonzero" xlink:href="#cross-c"></use>
-          <g fill="#7600FF" mask="url(#cross-d)">
+          <g fill="#000000" mask="url(#cross-d)">
             <rect width="24" height="24" transform="translate(-7 -7)"></rect>
           </g>
         </g>
@@ -193,7 +191,6 @@ withDefaults(defineProps<Props>(), {
     :style="{ color }"
     v-if="name === 'cartsIcon'"
     xmlns="http://www.w3.org/2000/svg"
-    class="h-[18px] w-[18px]"
     fill="none"
     viewBox="0 0 24 24"
     stroke="currentColor"
@@ -203,6 +200,45 @@ withDefaults(defineProps<Props>(), {
       stroke-linecap="round"
       stroke-linejoin="round"
       d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"
+    />
+  </svg>
+
+  <svg
+    v-if="name === 'heartIcon'"
+    :width="size"
+    :height="size"
+    :style="{ color }"
+    xmlns="http://www.w3.org/2000/svg"
+    class="h-6 w-6"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    stroke-width="2"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+    />
+  </svg>
+
+  <svg
+    v-if="name === 'wishlistIcon'"
+    :width="size"
+    :height="size"
+    xmlns="http://www.w3.org/2000/svg"
+    class="cursor-pointer transition-colors"
+    :class="
+      isWishlisted
+        ? 'text-red-500 fill-red-500'
+        : 'text-gray-700 fill-none stroke-current stroke-2'
+    "
+    viewBox="0 0 24 24"
+  >
+    <path
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
     />
   </svg>
 </template>

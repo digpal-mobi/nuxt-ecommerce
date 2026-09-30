@@ -1,7 +1,11 @@
-<script setup lang="ts">
+<script lang="ts" setup>
 import Container from '~/components/ui/Container.vue';
 import MainContainer from '~/components/ui/MainContainer.vue';
-import SectionCart from '~/section/SectionCart.vue';
+import { useFilterStore } from '~/pinia/filter';
+import SectionWishlist from '~/section/SectionWishlist.vue';
+
+useFilterStore();
+await useCategories();
 
 useHead({
   title: 'SHOP.CO | Find Clothes That Matches Your Style',
@@ -12,12 +16,13 @@ useHead({
     },
   ],
 });
+
 </script>
 
 <template>
   <MainContainer>
-   <Container>
-    <SectionCart />
-   </Container>
+    <Container>   
+     <SectionWishlist/>
+    </Container>
   </MainContainer>
 </template>

@@ -10,6 +10,8 @@ interface CartState {
     totalQuantity: number;
     totalAmount: number;
     isMiniCartOpen: boolean;
+    wishlistedItems: Product[];
+    isWishlist: boolean;
 }
 
 export const useCartStore = defineStore('cart', {
@@ -18,6 +20,8 @@ export const useCartStore = defineStore('cart', {
         totalQuantity: 0,
         totalAmount: 0,
         isMiniCartOpen: false,
+        wishlistedItems: [],
+        isWishlist: false
     }),
     actions: {
         openMiniCart() {
@@ -28,6 +32,22 @@ export const useCartStore = defineStore('cart', {
         },
         toggleMiniCart() {
             this.isMiniCartOpen = !this.isMiniCartOpen;
+        },
+        addToWishlist(product: Product){
+            this.isWishlist = true;
+            this.wishlistedItems.push(product);
+        },
+        removeFromWishlist(productId: number | string) {
+            this.wishlistedItems = this.wishlistedItems.filter(item => item.id !== productId);
+            this.isWishlist = false;
+        },
+        toggleWishlist(product: Product) {
+            const existingItem = this.wishlistedItems.find(item => item.id === product.id);
+            if (existingItem) {
+                this.removeFromWishlist(product.id);
+            } else {
+                this.addToWishlist(product);
+            }
         },
         addToCart(product: Product, quantity: number = 1) {
             const existingItem = this.items.find(item => item.id === product.id); // check if the item already exists in the cart
@@ -42,10 +62,10 @@ export const useCartStore = defineStore('cart', {
             this.totalAmount += product.price * quantity; // add the price to the total amount
             this.openMiniCart(); // open the mini cart
         },
-        updateCart(productId:number,quantity:number){
-            const item = this.items.find(item=>item.id === productId); // find the item in the cart
+        updateCart(productId: number | string, quantity: number) {
+            const item = this.items.find(item => item.id === productId); // find the item in the cart
 
-            if(!item) return; // if the item is not found, return
+            if (!item) return; // if the item is not found, return
             
             const priceDifference = item.price * quantity - item.price * item.quantity; // calculate the price difference
             
@@ -53,14 +73,14 @@ export const useCartStore = defineStore('cart', {
             this.totalQuantity += quantity; // update the total quantity
             this.totalAmount += priceDifference; // update the total amount
         },
-        removeFromCart(productId:number){
-            const item = this.items.find(item=>item.id === productId); // find the item in the cart
+        removeFromCart(productId: number | string) {
+            const item = this.items.find(item => item.id === productId); // find the item in the cart
 
-            if(!item) return; // if the item is not found, return
+            if (!item) return; // if the item is not found, return
             
             this.totalQuantity -= item.quantity; // subtract the quantity from the total quantity
             this.totalAmount -= item.price * item.quantity; // subtract the price from the total amount
-            this.items = this.items.filter(item=>item.id !== productId); // remove the item from the cart
+            this.items = this.items.filter(item => item.id !== productId); // remove the item from the cart
         },
         clearCart(){
             this.items = [];
@@ -82,6 +102,9 @@ export const useCartStore = defineStore('cart', {
         cartTotalAmount(state): number {
             return state.totalAmount;
         },
+        wishlistQuantity(state): number {
+            return state.wishlistedItems.length;
+        }
     },
     
 })
