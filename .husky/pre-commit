@@ -1,0 +1,31 @@
+echo "🚀 PRE-COMMIT HOOK RUNNING"
+
+. "$(dirname -- "$0")/common.sh"
+
+if [ -s "$HOME/.asdf/asdf.sh" ]; then
+  . "$HOME/.asdf/asdf.sh" >/dev/null 2>&1
+fi
+
+if [ -d "$HOME/.volta/bin" ]; then
+  export PATH="$HOME/.volta/bin:$PATH"
+fi
+
+if ! command -v node >/dev/null 2>&1; then
+  echo "[husky] Node.js is not available in PATH."
+  exit 1
+fi
+
+if ! command -v npm >/dev/null 2>&1; then
+  echo "[husky] npm is not available in PATH."
+  exit 1
+fi
+
+echo "[husky] Running pre-commit quality checks..."
+
+echo "[husky] Running TypeScript check..."
+npm run typecheck || {
+  echo "[husky] TypeScript check failed."
+  exit 1
+}
+
+echo "[husky] ✅ All pre-commit checks passed."
