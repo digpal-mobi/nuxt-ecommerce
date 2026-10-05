@@ -22,17 +22,15 @@ const emit = defineEmits<{
 
 const decrease = () => {
   if (props.value > props.min) {
-    const newVal = props.value - 1;
-    emit('change', newVal);
-    emit('update:modelValue', newVal);
+    emit('change', props.value - 1);
+    emit('update:modelValue', props.value - 1);
   }
 };
 
 const increase = () => {
   if (props.value < props.max) {
-    const newVal = props.value + 1;
-    emit('change', newVal);
-    emit('update:modelValue', newVal);
+    emit('change', props.value + 1);
+    emit('update:modelValue', props.value + 1);
   }
 };
 </script>

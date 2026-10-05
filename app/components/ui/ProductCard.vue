@@ -26,6 +26,9 @@ const props = withDefaults(defineProps<Props>(), {
 
 const cartStore = useCartStore();
 
+// Local reactive quantity for this product card
+const localQuantity = ref(props.quantity);
+
 const emit = defineEmits<{
   (e: 'toggleWishlist', event: MouseEvent, product: Product): void;
   (e: 'quantityChange', quantity: number, product: Product): void;
@@ -49,11 +52,12 @@ const handleToggleWishlist = (e: MouseEvent) => {
 };  
 
 const handleQuantityChange = (qty: number) => {
+  localQuantity.value = qty;
   emit('quantityChange', qty, props.product);
 };
 
 const handleAddToCart = () => {
-  cartStore.addToCart(props.product, props.quantity);
+  cartStore.addToCart(props.product, localQuantity.value);
 };
 </script>
 
@@ -130,7 +134,7 @@ const handleAddToCart = () => {
 
     <div class="mt-[16px] flex w-full items-center gap-[10px]">
       <Increment
-        :value="quantity"
+        :value="localQuantity"
         class="!h-[46px] !min-w-[95px] shrink-0 !px-[12px]"
         @change="handleQuantityChange"
       />

@@ -61,11 +61,11 @@ function formatBreadcrumbLabel(name: string): string {
 
 <style scoped>
 .breadcrumb-wrapper {
-    padding: 20px 100px;
-    max-width: 1440px;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
+  padding-block: 20px;
+  max-width: 1440px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
 }
 .breadcrumb {
     list-style: none;

@@ -1,9 +1,14 @@
 <script setup lang="ts">
+import Increment from '~/components/ui/Increment.vue';
 import { useCartStore } from '~/pinia/cart';
 import Icons from '~/utils/Icons.vue';
 
 const cartStore = useCartStore();
 const { cartItems } = storeToRefs(cartStore);
+
+const handleQuantityChange = (productId: number | string, value: number) => {
+  cartStore.updateQuantity(productId, value);
+};
 </script>
 
 <template>
@@ -124,29 +129,11 @@ const { cartItems } = storeToRefs(cartStore);
               <!-- Quantity + Total -->
               <div class="mt-auto flex items-center justify-between pt-3">
                 <!-- Quantity -->
-                <div
-                  class="flex items-center rounded-md border border-gray-200"
-                >
-                  <button
-                    type="button"
-                    class="flex h-7 w-7 cursor-pointer items-center justify-center text-gray-500 transition hover:bg-gray-100 hover:text-black"
-                  >
-                    −
-                  </button>
-
-                  <span
-                    class="flex h-7 min-w-8 items-center justify-center border-x border-gray-200 text-sm font-medium"
-                  >
-                    {{ cart.quantity }}
-                  </span>
-
-                  <button
-                    type="button"
-                    class="flex h-7 w-7 cursor-pointer items-center justify-center text-gray-500 transition hover:bg-gray-100 hover:text-black"
-                  >
-                    +
-                  </button>
-                </div>
+               <Increment 
+               :value="cart.quantity"
+               @change="(value) => handleQuantityChange(cart.id, value)"
+               class="!h-[46px] !min-w-[95px] shrink-0 !px-[12px]"
+               />
 
                 <!-- Item Total -->
                 <span class="text-sm font-semibold text-gray-900">

@@ -5,7 +5,7 @@ defineProps<{
 </script>
 
 <template>
-  <div :class="['max-w-full', $props.class]">
+  <div :class="['w-full', $props.class]">
     <slot />
   </div>
 </template>

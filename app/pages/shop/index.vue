@@ -27,7 +27,7 @@ useHead({
       <UiBreadcrumb />
 
       <div
-        class="flex flex-col laptop:flex-row items-start gap-x-[30px] gap-y-[10px] laptop:px-[80px] px-[16px] pb-[40px]"
+        class="flex flex-col laptop:flex-row items-start gap-x-[30px] gap-y-[10px] pb-[40px]"
       >
         <SectionFilter />   
         <div class="flex-1 w-full min-w-0">
