@@ -22,17 +22,15 @@ const emit = defineEmits<{
 
 const decrease = () => {
   if (props.value > props.min) {
-    const newVal = props.value - 1;
-    emit('change', newVal);
-    emit('update:modelValue', newVal);
+    emit('change', props.value - 1);
+    emit('update:modelValue', props.value - 1);
   }
 };
 
 const increase = () => {
   if (props.value < props.max) {
-    const newVal = props.value + 1;
-    emit('change', newVal);
-    emit('update:modelValue', newVal);
+    emit('change', props.value + 1);
+    emit('update:modelValue', props.value + 1);
   }
 };
 </script>
@@ -45,24 +43,26 @@ const increase = () => {
       props.class,
     ]"
   >
-    <button
-      type="button"
-      :disabled="props.value <= props.min"
-      class="flex h-5 w-5 items-center justify-center text-[18px] font-bold text-black transition-opacity hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-30"
-      aria-label="Decrease quantity"
-      @click="decrease"
-    >
-      −
-    </button>
-    <span class="px-2 font-bold">{{ props.value }}</span>
-    <button
-      type="button"
-      :disabled="props.value >= props.max"
-      class="flex h-5 w-5 items-center justify-center text-[18px] font-bold text-black transition-opacity hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-30"
-      aria-label="Increase quantity"
-      @click="increase"
-    >
-      +
-    </button>
+   <button
+  type="button"
+  :disabled="props.value <= props.min"
+  class="flex h-5 w-5 items-center justify-center text-[18px] font-bold text-black transition-opacity hover:opacity-70 enabled:cursor-pointer disabled:cursor-not-allowed disabled:opacity-30"
+  aria-label="Decrease quantity"
+  @click="decrease"
+>
+  −
+</button>
+
+<span class="px-2 font-bold">{{ props.value }}</span>
+
+<button
+  type="button"
+  :disabled="props.value >= props.max"
+  class="flex h-5 w-5 items-center justify-center text-[18px] font-bold text-black transition-opacity hover:opacity-70 enabled:cursor-pointer disabled:cursor-not-allowed disabled:opacity-30"
+  aria-label="Increase quantity"
+  @click="increase"
+>
+  +
+</button>
   </div>
 </template>

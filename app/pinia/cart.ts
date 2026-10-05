@@ -7,8 +7,6 @@ interface CartItem extends Product {
 
 interface CartState {
     items: CartItem[];
-    totalQuantity: number;
-    totalAmount: number;
     isMiniCartOpen: boolean;
     wishlistedItems: Product[];
     isWishlist: boolean;
@@ -17,12 +15,27 @@ interface CartState {
 export const useCartStore = defineStore('cart', {
     state: (): CartState => ({
         items: [],
-        totalQuantity: 0,
-        totalAmount: 0,
         isMiniCartOpen: false,
         wishlistedItems: [],
         isWishlist: false
     }),
+        getters: {
+        isCartEmpty(state): boolean {
+            return state.items.length === 0;
+        },
+        cartItems(state): CartItem[] {
+            return state.items;
+        },
+        totalQuantity(state): number {
+            return state.items.reduce((total, item) => total + item.quantity, 0); // using reduce to calculate the total quantity
+        },
+        totalAmount(state): number {
+            return state.items.reduce((total, item) => total + item.price * item.quantity, 0); // using reduce to calculate the total amount
+        },
+        wishlistQuantity(state): number {
+            return state.wishlistedItems.length;
+        }
+    },
     actions: {
         openMiniCart() {
             this.isMiniCartOpen = true;
@@ -49,61 +62,48 @@ export const useCartStore = defineStore('cart', {
                 this.addToWishlist(product);
             }
         },
-        addToCart(product: Product, quantity: number = 1) {
-            const existingItem = this.items.find(item => item.id === product.id); // check if the item already exists in the cart
+       addToCart(product: Product, quantity: number = 1) {
+      const existingItem = this.items.find(
+        item => item.id === product.id
+      );
 
-            if (existingItem) { // if the item exists, update the quantity
-                existingItem.quantity += quantity;
-            } else { // if the item does not exist, add it to the cart
-                this.items.push({ ...product, quantity });
-            }
+      if (existingItem) {
+        existingItem.quantity += quantity;
+      } else {
+        this.items.push({
+          ...product,
+          quantity,
+        });
+      }
 
-            this.totalQuantity += quantity; // add the quantity to the total quantity
-            this.totalAmount += product.price * quantity; // add the price to the total amount
-            this.openMiniCart(); // open the mini cart
-        },
-        updateCart(productId: number | string, quantity: number) {
-            const item = this.items.find(item => item.id === productId); // find the item in the cart
+      this.openMiniCart();
+    },
+    updateQuantity(productId: number | string, quantity: number) {
+      const item = this.items.find(item => item.id === productId);
 
-            if (!item) return; // if the item is not found, return
-            
-            const priceDifference = item.price * quantity - item.price * item.quantity; // calculate the price difference
-            
-            item.quantity = quantity; // update the quantity
-            this.totalQuantity += quantity; // update the total quantity
-            this.totalAmount += priceDifference; // update the total amount
-        },
+      if (!item) return;
+
+      if (quantity <= 0) {
+        this.removeFromCart(productId);
+      } else {
+        item.quantity = quantity;
+      }
+    },
+    updateCart(productId: number | string, quantity: number) {
+      this.updateQuantity(productId, quantity);
+    },
         removeFromCart(productId: number | string) {
-            const item = this.items.find(item => item.id === productId); // find the item in the cart
+      this.items = this.items.filter(
+        item => item.id !== productId
+      );
+    },
 
-            if (!item) return; // if the item is not found, return
-            
-            this.totalQuantity -= item.quantity; // subtract the quantity from the total quantity
-            this.totalAmount -= item.price * item.quantity; // subtract the price from the total amount
-            this.items = this.items.filter(item => item.id !== productId); // remove the item from the cart
-        },
         clearCart(){
             this.items = [];
-            this.totalQuantity = 0;
-            this.totalAmount = 0;
-            this.closeMiniCart();
         },
-    },
-    getters: {
-        isCartEmpty(state): boolean {
-            return state.items.length === 0;
-        },
-        cartItems(state): CartItem[] {
-            return state.items;
-        },
-        cartTotalQuantity(state): number {
-            return state.totalQuantity;
-        },
-        cartTotalAmount(state): number {
-            return state.totalAmount;
-        },
-        wishlistQuantity(state): number {
-            return state.wishlistedItems.length;
+        clearWishlistItems(){
+            this.wishlistedItems = [];
+            this.isWishlist = false;
         }
     },
     

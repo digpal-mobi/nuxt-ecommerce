@@ -1,6 +1,7 @@
 import type { UseFetchOptions } from 'nuxt/app';
 import type { MaybeRefOrGetter } from 'vue';
 import type { Category } from '~/pinia/category';
+import type { ProductDetail } from '~/types/product';
 
 export const API_ENDPOINTS = {
   PRODUCTS: {
@@ -59,8 +60,8 @@ export const apiProducts = {
     });
   },
 
-  getProductById: (id: MaybeRefOrGetter<string | number>, options?: UseFetchOptions<any>) => {
-    return useApiFetch<any>(() => API_ENDPOINTS.PRODUCTS.DETAIL(toValue(id)), options);
+  getProductById: (id: MaybeRefOrGetter<string | number>, options?: UseFetchOptions<ProductDetail>) => {
+    return useApiFetch<ProductDetail>(() => API_ENDPOINTS.PRODUCTS.DETAIL(toValue(id)), options);
   },
 
   getCategories: (options?: UseFetchOptions<Category[]>) => {

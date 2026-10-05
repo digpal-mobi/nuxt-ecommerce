@@ -69,21 +69,21 @@ watch(
   { deep: true }
 );
 
-// Fetch whenever page changes
-watch(currentPage, async (page) => {
-  const result = await $apiFetch<ProductsResponse>(API_ENDPOINTS.PRODUCTS.LIST, {
-    query: {
-      categories: filterStore.categories.join(','),
-      brands: filterStore.brands.join(','),
-      rating: filterStore.rating,
-      minPrice: filterStore.minPrice,
-      maxPrice: filterStore.maxPrice,
-      limit,
-      skip: (page - 1) * limit,
-    },
-  });
-  data.value = result;
-});
+// // Fetch whenever page changes
+// watch(currentPage, async (page) => {
+//   const result = await $apiFetch<ProductsResponse>(API_ENDPOINTS.PRODUCTS.LIST, {
+//     query: {
+//       categories: filterStore.categories.join(','),
+//       brands: filterStore.brands.join(','),
+//       rating: filterStore.rating,
+//       minPrice: filterStore.minPrice,
+//       maxPrice: filterStore.maxPrice,
+//       limit,
+//       skip: (page - 1) * limit,
+//     },
+//   });
+//   data.value = result;
+// });
 
 
 watchEffect(() => {

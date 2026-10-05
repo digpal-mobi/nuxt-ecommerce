@@ -11,7 +11,6 @@ export default defineNuxtConfig({
       tailwindcss(),
       ],
   },
-
   runtimeConfig: {
     public: {
       baseUrl: process.env.BASE_URL || 'https://dummyjson.com/',
@@ -19,6 +18,10 @@ export default defineNuxtConfig({
   },
 
   app: {
+    pageTransition: {
+      name: 'page',
+      mode: 'out-in',
+    },
     head: {
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
