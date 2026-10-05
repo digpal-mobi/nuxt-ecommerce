@@ -43,24 +43,26 @@ const increase = () => {
       props.class,
     ]"
   >
-    <button
-      type="button"
-      :disabled="props.value <= props.min"
-      class="flex h-5 w-5 items-center justify-center text-[18px] font-bold text-black transition-opacity hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-30"
-      aria-label="Decrease quantity"
-      @click="decrease"
-    >
-      −
-    </button>
-    <span class="px-2 font-bold">{{ props.value }}</span>
-    <button
-      type="button"
-      :disabled="props.value >= props.max"
-      class="flex h-5 w-5 items-center justify-center text-[18px] font-bold text-black transition-opacity hover:opacity-70 disabled:cursor-not-allowed disabled:opacity-30"
-      aria-label="Increase quantity"
-      @click="increase"
-    >
-      +
-    </button>
+   <button
+  type="button"
+  :disabled="props.value <= props.min"
+  class="flex h-5 w-5 items-center justify-center text-[18px] font-bold text-black transition-opacity hover:opacity-70 enabled:cursor-pointer disabled:cursor-not-allowed disabled:opacity-30"
+  aria-label="Decrease quantity"
+  @click="decrease"
+>
+  −
+</button>
+
+<span class="px-2 font-bold">{{ props.value }}</span>
+
+<button
+  type="button"
+  :disabled="props.value >= props.max"
+  class="flex h-5 w-5 items-center justify-center text-[18px] font-bold text-black transition-opacity hover:opacity-70 enabled:cursor-pointer disabled:cursor-not-allowed disabled:opacity-30"
+  aria-label="Increase quantity"
+  @click="increase"
+>
+  +
+</button>
   </div>
 </template>

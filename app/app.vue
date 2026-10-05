@@ -1,19 +1,12 @@
-<script setup lang="ts">
-</script>
-
 <template>
   <NuxtLoadingIndicator
-    color="#000"
-    :height="20"
-    :duration="5000"
+    color="#49BBBD"
+    :height="3"
+    :duration="2000"
+    :throttle="0"
   />
+
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
 </template>
-
-
-
-
-
-
